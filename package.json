@@ -1,0 +1,53 @@
+{
+  "name": "sendgrid-event-data",
+  "description": "receive sendgrid event log via webhook, and store to bigquery",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "functions-framework --source=build/src/ --target=sendGridWebhook",
+    "watch": "concurrently \"tsc -w\" \"nodemon --watch ./build/ --exec npm run start\"",
+    "test": "jest",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/funami/sendgrid-event-data.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/funami/sendgrid-event-data/issues"
+  },
+  "homepage": "https://github.com/funami/sendgrid-event-data#readme",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.1.2",
+    "@sendgrid/eventwebhook": "^7.7.0",
+    "basic-auth": "^2.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "fs-extra": "^10.1.0"
+  },
+  "devDependencies": {
+    "@types/basic-auth": "^1.1.3",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/fs-extra": "^9.0.13",
+    "@types/jest": "^28.1.7",
+    "@types/node": "^14.11.2",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "@typescript-eslint/typescript-estree": "^5.33.1",
+    "concurrently": "^7.3.0",
+    "eslint": "^8.22.0",
+    "gts": "^3.1.0",
+    "jest": "^28.1.3",
+    "nodemon": "^2.0.19",
+    "ts-jest": "^28.0.8",
+    "typescript": "^4.4.4"
+  }
+}
