@@ -1,2 +1,2 @@
-import {sendGridWebhook} from './controller/send_grid_webhook';
+import {sendGridWebhook} from './controller/sendgrid_webhook';
 export {sendGridWebhook};

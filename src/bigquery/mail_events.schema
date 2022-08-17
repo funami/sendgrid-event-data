@@ -1,0 +1,32 @@
+[
+  {
+    "name": "subscription_name",
+    "mode": "NULLABLE",
+    "type": "STRING",
+    "fields": []
+  },
+  {
+    "name": "data",
+    "mode": "NULLABLE",
+    "type": "BYTES",
+    "fields": []
+  },
+  {
+    "name": "message_id",
+    "mode": "NULLABLE",
+    "type": "STRING",
+    "fields": []
+  },
+  {
+    "name": "publish_time",
+    "mode": "NULLABLE",
+    "type": "TIMESTAMP",
+    "fields": []
+  },
+  {
+    "name": "attributes",
+    "mode": "NULLABLE",
+    "type": "STRING",
+    "fields": []
+  }
+]

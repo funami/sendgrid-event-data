@@ -1,5 +1,10 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
-import {sendGridWebhook} from '../../controller/send_grid_webhook';
+import {
+  sendGridWebhook,
+  SENDGRID_MAIL_EVENT_PUB,
+} from '../../controller/sendgrid_webhook';
+import {PubSub} from '@google-cloud/pubsub';
+const pubSubClient = new PubSub();
 import fs from 'fs-extra';
 class MockRequest {
   constructor(public headers: Record<string, string>, public rawBody: Buffer) {}
@@ -15,7 +20,16 @@ const mockRes: Record<string, jest.Mock> = {
   status: jest.fn().mockReturnThis(),
   json: jest.fn().mockReturnThis(),
 };
-
+if (!process.env.PUBSUB_EMULATOR_HOST) {
+  throw '!!!PLEASE USE pub/sub emulator for test!!!';
+}
+beforeAll(async () => {
+  try {
+    await pubSubClient.createTopic(SENDGRID_MAIL_EVENT_PUB);
+  } catch (e) {
+    //console.error(e);
+  }
+});
 beforeEach(() => {
   Object.keys(mockRes).forEach(key => {
     mockRes[key].mockClear();
@@ -39,7 +53,9 @@ describe('sendGridWebhook', () => {
       },
       rawBody
     );
-    await sendGridWebhook(mockReq as any, mockRes as any);
+    await expect(
+      sendGridWebhook(mockReq as any, mockRes as any)
+    ).resolves.toMatch(/\d+/);
     expect(mockRes.json).not.toHaveBeenCalled();
     expect(mockRes.status).not.toHaveBeenCalled();
     expect(mockRes.send).toHaveBeenCalledWith('OK');
@@ -61,7 +77,9 @@ describe('sendGridWebhook', () => {
       },
       rawBody
     );
-    await sendGridWebhook(mockReq as any, mockRes as any);
+    await expect(
+      sendGridWebhook(mockReq as any, mockRes as any)
+    ).resolves.toBeNull();
     expect(mockRes.json).toHaveBeenCalledWith({
       msg: 'Unauthorized',
     });
@@ -83,7 +101,9 @@ describe('sendGridWebhook', () => {
       },
       rawBody
     );
-    await sendGridWebhook(mockReq as any, mockRes as any);
+    await expect(
+      sendGridWebhook(mockReq as any, mockRes as any)
+    ).resolves.toBeNull();
     expect(mockRes.json).not.toHaveBeenCalled();
     expect(mockRes.send).toHaveBeenCalledWith('');
     expect(mockRes.status).toHaveBeenCalledWith(401);

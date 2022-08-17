@@ -2,15 +2,15 @@
   "name": "sendgrid-event-data",
   "description": "receive sendgrid event log via webhook, and store to bigquery",
   "version": "0.1.0",
+  "main": "build/src/index.js",
   "scripts": {
     "start": "functions-framework --source=build/src/ --target=sendGridWebhook",
     "watch": "concurrently \"tsc -w\" \"nodemon --watch ./build/ --exec npm run start\"",
-    "test": "jest",
+    "test": "SENDGRID_MAIL_EVENT_PUB=sendgrid_mail_event_pub_test jest --detectOpenHandles",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run lint"
   },
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/funami/sendgrid-event-data#readme",
   "dependencies": {
     "@google-cloud/functions-framework": "^3.1.2",
+    "@google-cloud/pubsub": "^3.1.0",
     "@sendgrid/eventwebhook": "^7.7.0",
     "basic-auth": "^2.0.1",
     "cors": "^2.8.5",
