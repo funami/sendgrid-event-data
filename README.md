@@ -44,6 +44,17 @@ uncheck `drop unknown fields`
 
 ## Cloud Function Deploy
 
+```
+gcloud beta functions deploy send-grid-webhook \
+--gen2 \
+--region=asia-northeast1 \
+--runtime=nodejs16 \
+--entry-point=sendGridWebhook \
+--trigger-http \
+--allow-unauthenticated \
+--set-secrets SENDGRID_VERIFICATION_KEY=projects/${GCLOUD_PROJECT_ID}/secrets/SENDGRID_VERIFICATION_KEY:latest
+```
+
 # dev
 
 ## pub/sub emulator
