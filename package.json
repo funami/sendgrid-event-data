@@ -1,7 +1,7 @@
 {
   "name": "sendgrid-event-data",
   "description": "receive sendgrid event log via webhook, and store to bigquery",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "build/src/index.js",
   "scripts": {
     "start": "functions-framework --source=build/src/ --target=sendGridWebhook",
