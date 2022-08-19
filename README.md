@@ -27,26 +27,46 @@ SENDGRID_MAIL_EVENT_PUB='[topic name]'
 
 ## Create BigQuery Dataset and Table
 
-- dataset: ex. sendgid
-- table: ex. mail_events with mail_events.schema
+- dataset: ex. `sendgrid`
+- table: ex. `mail_events`
+
+  - schema: src/bigquery/mail_events.schema
+  - partitioning: daily
 
 - scheduled query
-  1. for today - scheduled_query_today.sql every 8 hours
-  2. for lastday - scheduled_query_lastday.sql at 8:00
+  1. for today
+  - query SQL: src/bigquery/scheduled_query_today.sql
+  - query name: `mail_events_daily_today`
+  - schedule: ondemand
+  - write to:
+    - dataset: `sendgrid`
+    - table id: `mail_events_daily_{run_date}`
+    - overwrite: true
+  2. for lastday
+  - query SQL: src/bigquery/scheduled_query_lastday.sql
+  - query name: `mail_events_daily_lastday`
+  - schedule: at 8:00
+  - write to:
+    - dataset: `sendgrid`
+    - table id: `mail_events_daily_{run_time-24h|"%Y%m%d"}`
+    - overwrite: true
 
 ## Create Pub/Sub Subscription
 
-set bigquery dataset and table
+- subscription id: ex. `sendgrid_mail_event_sub`
+
+set bigquery dataset(ex. `sendgrid`) and table (ex. `mail_events`)
 
 - delivery type Write to BigQuery
 - uncheck `use topic schema`
 - check `write metadata`
 - uncheck `drop unknown fields`
 
+if cannot create subscription, try add permission for bigquery `mail_events` table to service account of pub/sub
+
 ## Cloud Function Deploy
 
 ```
-GCP_PROJECT=[your project id]
 SENDGRID_VERIFICATION_KEY='[Verification Key]'
 SENDGRID_MAIL_EVENT_PUB='[topic name]'
 
@@ -64,7 +84,15 @@ gcloud beta functions deploy send-grid-webhook \
 
 https://app.sendgrid.com/settings/mail_settings
 
-set cloudfunction endpoint url to `HTTP Post URL` and push `Test Your Integration`
+set cloudfunction endpoint url to `HTTP Post URL` and set `Event Webhook Status` to Enabled
+and Save..
+(if not save ,"X-Twilio-Email-Event-Webhook-Signature" and "X-Twilio-Email-Event-Webhook-Timestamp" headers do not send.
+so verification failed
+if you dont save in production, please test sendgrid dev account, before make it.)
+
+reopen Event Webhook
+
+push `Test Your Integration`
 
 ### CHECK
 

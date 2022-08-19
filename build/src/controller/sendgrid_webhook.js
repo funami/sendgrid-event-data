@@ -28,6 +28,13 @@ const pubData = async (data) => {
     }
     return null;
 };
+const debugData = (req) => {
+    var _a;
+    return JSON.stringify({
+        headers: req.headers,
+        rawBody: (_a = req.rawBody) === null || _a === void 0 ? void 0 : _a.toString(),
+    });
+};
 const sendGridWebhook = async (req, res) => {
     const eh = new eventwebhook_1.EventWebhook();
     try {
@@ -41,7 +48,7 @@ const sendGridWebhook = async (req, res) => {
             verifyResult = eh.verifySignature(eh.convertPublicKeyToECDSA(pk), req.rawBody, signature, timestamp);
         }
         catch (e) {
-            console.error(e);
+            console.error(e, debugData(req));
         }
         if (verifyResult) {
             const messgaeId = await pubData(req.rawBody)
@@ -50,21 +57,22 @@ const sendGridWebhook = async (req, res) => {
                 return messgaeId;
             })
                 .catch(e => {
-                console.error(e);
+                console.error(e, debugData(req));
                 res.status(500).send('');
                 return null;
             });
             return messgaeId;
         }
         else {
+            console.error('verifyResult is false', debugData(req));
             res.status(401).json({
                 msg: 'Unauthorized',
             });
         }
     }
     catch (e) {
-        //console.error('Unauthorized 1');
-        res.status(401).send('');
+        console.debug(e, debugData(req));
+        res.status(401).send('Unauthorized');
     }
     return null;
 };

@@ -6,6 +6,7 @@ import type {HttpFunction} from '@google-cloud/functions-framework/build/src/fun
 const pk = process.env.SENDGRID_VERIFICATION_KEY;
 if (!pk) throw new Error('Please set SENDGRID_VERIFICATION_KEY');
 import {PubSub, Topic} from '@google-cloud/pubsub';
+import {Request} from '@google-cloud/functions-framework';
 const pubSubClient = new PubSub();
 export const SENDGRID_MAIL_EVENT_PUB =
   process.env.SENDGRID_MAIL_EVENT_PUB || 'sendgrid_mail_event_pub';
@@ -23,6 +24,12 @@ const pubData = async (data: Buffer): Promise<string | null> => {
     else console.error(`Received error while publishing, ${e}`);
   }
   return null;
+};
+const debugData = (req: Request) => {
+  return JSON.stringify({
+    headers: req.headers,
+    rawBody: req.rawBody?.toString(),
+  });
 };
 export const sendGridWebhook: HttpFunction = async (
   req,
@@ -46,7 +53,7 @@ export const sendGridWebhook: HttpFunction = async (
         timestamp
       );
     } catch (e) {
-      console.error(e);
+      console.error(e, debugData(req));
     }
     if (verifyResult) {
       const messgaeId = await pubData(req.rawBody)
@@ -55,19 +62,20 @@ export const sendGridWebhook: HttpFunction = async (
           return messgaeId;
         })
         .catch(e => {
-          console.error(e);
+          console.error(e, debugData(req));
           res.status(500).send('');
           return null;
         });
       return messgaeId;
     } else {
+      console.error('verifyResult is false', debugData(req));
       res.status(401).json({
         msg: 'Unauthorized',
       });
     }
   } catch (e) {
-    //console.error('Unauthorized 1');
-    res.status(401).send('');
+    console.debug(e, debugData(req));
+    res.status(401).send('Unauthorized');
   }
   return null;
 };

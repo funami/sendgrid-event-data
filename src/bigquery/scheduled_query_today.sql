@@ -48,7 +48,7 @@ WITH
               JSON_EXTRACT_SCALAR(data, "$.event") AS event,
               JSON_EXTRACT_SCALAR(data, "$.email") AS email,
               JSON_EXTRACT_SCALAR(data, "$.useragent") AS useragent,
-              JSON_EXTRACT_SCALAR(data, "$.useragent") AS url,
+              JSON_EXTRACT_SCALAR(data, "$.url") AS url,
               JSON_EXTRACT_SCALAR(data, "$.reason") AS reason,
               JSON_EXTRACT_SCALAR(data, "$.status") AS status,
               JSON_EXTRACT_SCALAR(data, "$.attempt") AS attempt,

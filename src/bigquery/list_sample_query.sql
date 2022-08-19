@@ -1,6 +1,6 @@
 # set schedule query, 
-# query name: `mail_events_daily_lastday`
-# table id: `mail_events_daily_{run_time-24h|"%Y%m%d"}`
+# query name: `mail_events_daily_today`
+# table id: `mail_events_daily_{run_date}`
 # overwrite
 WITH
   `raw_data` AS (
@@ -11,9 +11,8 @@ WITH
     FROM
       `sendgrid.mail_events`
     WHERE
-      DATE(_PARTITIONTIME) = CURRENT_DATE()
-      OR DATE(_PARTITIONTIME) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
-      OR _PARTITIONTIME IS NULL
+      (DATE(_PARTITIONTIME) = CURRENT_DATE()
+      OR _PARTITIONTIME IS NULL) 
   ),
   `raw_events` AS (
     SELECT
@@ -73,8 +72,20 @@ WITH
       row_num = 1
   )
 SELECT
-  *
+  timestamp,
+  event,
+  MD5(email) mail_hashed,
+  SPLIT(email, "@")[OFFSET(1)] email_domain,
+  sg_message_id,
+  marketing_campaign_id,
+  marketing_campaign_name,
+  url,
+  useragent,
+  reason,
+  status
 FROM
   events
 WHERE
-  DATE(timestamp) = DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
+  DATE(timestamp) = CURRENT_DATE() AND email != "example@test.com"
+ORDER BY
+  event, timestamp
