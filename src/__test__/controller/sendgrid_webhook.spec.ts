@@ -1,4 +1,6 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
+process.env.SENDGRID_VERIFICATION_KEY =
+  'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEisUZKmTvAcMnqf1cenjsvVm72Oo28ExFpGMvzxC+10BQcn5mhCctHmG1mmBoWmn3BRVsuLCyShvJsPGJFQ5Kag==';
 import {
   sendGridWebhook,
   SENDGRID_MAIL_EVENT_PUB,
@@ -48,8 +50,8 @@ describe('sendGridWebhook', () => {
         'x-forwarded-for': '18.190.12.217',
         'x-forwarded-proto': 'https',
         'x-twilio-email-event-webhook-signature':
-          'MEUCIQCg9HmXkZ22WZsCtrY6IMBUbXSBVMVypYAftMUDEf5XbgIgFH/qRsJ3mTFuCg13IiEJ/dhpHz35jJ7XEstCD93pcMc=',
-        'x-twilio-email-event-webhook-timestamp': '1660623877',
+          'MEYCIQCHMAoGvI6oszb5KHvNukigtFgWCDQdkIGgLA1CHrLyRQIhAIKF44uJlWzR6Dr6Xv6KpLI9TtFUm8JbzOr4zqcUZQ50',
+        'x-twilio-email-event-webhook-timestamp': '1660894947',
       },
       rawBody
     );
@@ -105,7 +107,7 @@ describe('sendGridWebhook', () => {
       sendGridWebhook(mockReq as any, mockRes as any)
     ).resolves.toBeNull();
     expect(mockRes.json).not.toHaveBeenCalled();
-    expect(mockRes.send).toHaveBeenCalledWith('');
+    expect(mockRes.send).toHaveBeenCalledWith('Unauthorized');
     expect(mockRes.status).toHaveBeenCalledWith(401);
   });
 });

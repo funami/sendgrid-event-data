@@ -4,6 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 /* eslint @typescript-eslint/no-explicit-any: 0 */
+process.env.SENDGRID_VERIFICATION_KEY =
+    'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEisUZKmTvAcMnqf1cenjsvVm72Oo28ExFpGMvzxC+10BQcn5mhCctHmG1mmBoWmn3BRVsuLCyShvJsPGJFQ5Kag==';
 const sendgrid_webhook_1 = require("../../controller/sendgrid_webhook");
 const pubsub_1 = require("@google-cloud/pubsub");
 const pubSubClient = new pubsub_1.PubSub();
@@ -52,8 +54,8 @@ describe('sendGridWebhook', () => {
             'content-type': 'application/json',
             'x-forwarded-for': '18.190.12.217',
             'x-forwarded-proto': 'https',
-            'x-twilio-email-event-webhook-signature': 'MEUCIQCg9HmXkZ22WZsCtrY6IMBUbXSBVMVypYAftMUDEf5XbgIgFH/qRsJ3mTFuCg13IiEJ/dhpHz35jJ7XEstCD93pcMc=',
-            'x-twilio-email-event-webhook-timestamp': '1660623877',
+            'x-twilio-email-event-webhook-signature': 'MEYCIQCHMAoGvI6oszb5KHvNukigtFgWCDQdkIGgLA1CHrLyRQIhAIKF44uJlWzR6Dr6Xv6KpLI9TtFUm8JbzOr4zqcUZQ50',
+            'x-twilio-email-event-webhook-timestamp': '1660894947',
         }, rawBody);
         await expect((0, sendgrid_webhook_1.sendGridWebhook)(mockReq, mockRes)).resolves.toMatch(/\d+/);
         expect(mockRes.json).not.toHaveBeenCalled();
@@ -93,7 +95,7 @@ describe('sendGridWebhook', () => {
         }, rawBody);
         await expect((0, sendgrid_webhook_1.sendGridWebhook)(mockReq, mockRes)).resolves.toBeNull();
         expect(mockRes.json).not.toHaveBeenCalled();
-        expect(mockRes.send).toHaveBeenCalledWith('');
+        expect(mockRes.send).toHaveBeenCalledWith('Unauthorized');
         expect(mockRes.status).toHaveBeenCalledWith(401);
     });
 });
