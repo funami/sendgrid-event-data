@@ -64,7 +64,8 @@ WITH
                 JSON_EXTRACT_SCALAR(data, "$.sg_user_id AS") AS INT64
               ) AS sg_user_id,
               publish_time,
-              pt
+              pt,
+              JSON_EXTRACT_SCALAR(data, "$.purpose") AS purpose
             FROM
               raw_events
           )
