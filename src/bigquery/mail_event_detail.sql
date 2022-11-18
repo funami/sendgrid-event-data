@@ -141,8 +141,6 @@ daily_count AS (
     event,
     date,
     days,
-    url_path,
-    MIN(url_query) AS url_query,
     COUNT(*) AS count,
     COUNT(DISTINCT email) AS uu,
   FROM
@@ -151,8 +149,7 @@ daily_count AS (
     marketing_campaign_id,
     date,
     days,
-    event,
-    url_path
+    event
 ),
 -- daily_count_total
 -- 日毎のカウント数とUU、および累積カウント数とUUの一覧
@@ -160,6 +157,60 @@ daily_count_total AS (
   SELECT
     marketing_campaign_id,
     event,
+    "" AS url_path,
+    "" AS url_query,
+    date,
+    days,
+    count,
+    uu,
+    (
+      SELECT
+        count(*)
+      FROM
+        events_by_emails b
+      WHERE
+        b.date <= a.date
+        AND b.marketing_campaign_id = a.marketing_campaign_id
+        AND b.event = a.event
+    ) AS total_count,
+    (
+      SELECT
+        count(distinct email)
+      FROM
+        events_by_emails b
+      WHERE
+        b.date <= a.date
+        AND b.marketing_campaign_id = a.marketing_campaign_id
+        AND b.event = a.event
+    ) AS total_uu
+  FROM
+    daily_count a
+),
+daily_click_count AS (
+  SELECT
+    marketing_campaign_id,
+    event,
+    date,
+    days,
+    url_path,
+    MIN(url_query) AS url_query,
+    COUNT(*) AS count,
+    COUNT(DISTINCT email) AS uu,
+  FROM
+    events_by_emails
+  WHERE
+    event = "click"
+  GROUP BY
+    marketing_campaign_id,
+    date,
+    days,
+    event,
+    url_path
+),
+daily_click_url_count_total AS (
+  SELECT
+    marketing_campaign_id,
+    "click_detail" AS event,
     url_path,
     url_query,
     date,
@@ -201,7 +252,21 @@ daily_count_total AS (
         )
     ) AS total_uu
   FROM
-    daily_count a
+    daily_click_count a
+  WHERE
+    event = "click"
+),
+daily_count_total_union AS (
+  SELECT
+    *
+  FROM
+    daily_count_total
+  UNION
+  ALL
+  SELECT
+    *
+  FROM
+    daily_click_url_count_total
 ) -- **
 -- キャンペーンごとのサマリー
 -- **
@@ -213,7 +278,7 @@ SELECT
 EXCEPT
   (marketing_campaign_id)
 FROM
-  daily_count_total t
+  daily_count_total_union t
   JOIN marketing_campains_summary mcs ON t.marketing_campaign_id = mcs.marketing_campaign_id
 ORDER BY
   issue_date,
